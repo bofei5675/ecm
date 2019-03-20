@@ -40,15 +40,18 @@ tf.app.flags.DEFINE_integer("emotion_size", 100, "Size of emotion embedding.")
 tf.app.flags.DEFINE_integer("imemory_size", 256, "Size of imemory.")
 tf.app.flags.DEFINE_integer("category", 6, "category of emotions.")
 tf.app.flags.DEFINE_integer("num_layers", 2, "Number of layers in the model.")
-tf.app.flags.DEFINE_integer("post_vocab_size", 40000, "post vocabulary size.")
-tf.app.flags.DEFINE_integer("response_vocab_size", 40000, "response vocabulary size.")
-tf.app.flags.DEFINE_string("data_dir", "/home/data/tux/sentchat_code/data", "Data directory")
+# tf.app.flags.DEFINE_integer("post_vocab_size", 40000, "post vocabulary size.")
+# tf.app.flags.DEFINE_integer("response_vocab_size", 40000, "response vocabulary size.")
+tf.app.flags.DEFINE_integer("post_vocab_size", 158, "post vocabulary size.")
+tf.app.flags.DEFINE_integer("response_vocab_size", 776, "response vocabulary size.")
+
+tf.app.flags.DEFINE_string("data_dir", "/Users/jenn/Github/ecm/data", "Data directory")
 tf.app.flags.DEFINE_string("train_dir", "train", "Training directory.")
 tf.app.flags.DEFINE_string("pretrain_dir", "pretrain", "Pretraining directory.")
 tf.app.flags.DEFINE_integer("pretrain", -1, "pretrain model number")
 tf.app.flags.DEFINE_integer("max_train_data_size", 0,
                                                         "Limit on the size of training data (0: no limit).")
-tf.app.flags.DEFINE_integer("steps_per_checkpoint", 1000,
+tf.app.flags.DEFINE_integer("steps_per_checkpoint", 100,
                                                         "How many training steps to do per checkpoint.")
 tf.app.flags.DEFINE_boolean("use_emb", False,
                                                         "use embedding model")
@@ -213,12 +216,14 @@ def train():
             start_time = time.time()
             encoder_inputs, decoder_inputs, target_weights, decoder_emotions = model.get_batch(
                     train_set, bucket_id)
+            print("Start step {}!!!".format(current_step))
             _, step_loss, _ = model.step(sess, encoder_inputs, decoder_inputs,
                                                                      target_weights, decoder_emotions, bucket_id, False, False)
+            print("Finish step {}!!!".format(current_step))
             step_time += (time.time() - start_time) / FLAGS.steps_per_checkpoint
             loss += step_loss / FLAGS.steps_per_checkpoint
             current_step += 1
-
+            
             # Once in a while, we save checkpoint, print statistics, and run evals.
             if current_step % FLAGS.steps_per_checkpoint == 0:
                 # Print statistics for the previous epoch.
